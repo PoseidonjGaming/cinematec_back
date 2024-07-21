@@ -9,6 +9,6 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class MovieDTO extends BaseDTO{
+public class MovieDTO extends BaseDTO {
     private String name;
 }
