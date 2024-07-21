@@ -6,6 +6,7 @@ import java.util.List;
 
 public interface IBaseService<D extends BaseDTO> {
     List<D> getAll();
+    D getById(String id);
 
     void save(D dto);
 }
