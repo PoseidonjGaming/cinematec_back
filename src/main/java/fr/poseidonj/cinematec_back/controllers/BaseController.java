@@ -27,6 +27,11 @@ public abstract class BaseController<D extends BaseDTO, S extends IBaseService<D
         return ResponseEntity.ok(service.getById(id));
     }
 
+    @PostMapping("/byIds")
+    public ResponseEntity<List<D>> getByIds(@RequestBody List<String> ids){
+        return ResponseEntity.ok(service.getByIds(ids));
+    }
+
     @PostMapping("/save")
     public void save(@RequestBody D dto) {
         service.save(dto);

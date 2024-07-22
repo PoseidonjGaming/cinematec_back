@@ -26,6 +26,11 @@ public abstract class BaseService<E extends BaseEntity, D extends BaseDTO> imple
     }
 
     @Override
+    public List<D> getByIds(List<String> ids) {
+        return mapper.convertList(repository.findByIdIn(ids), dtoClass);
+    }
+
+    @Override
     public D getById(String id) {
         return repository.findById(id).map(e -> mapper.convert(e, dtoClass)).orElse(null);
     }
