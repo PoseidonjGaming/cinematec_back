@@ -1,12 +1,11 @@
 package fr.poseidonj.cinematec_back.controllers;
 
 import fr.poseidonj.cinematec_back.models.dtos.BaseDTO;
+import fr.poseidonj.cinematec_back.models.dtos.special.SearchDTO;
+import fr.poseidonj.cinematec_back.models.dtos.special.SortDTO;
 import fr.poseidonj.cinematec_back.service.IBaseService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -32,8 +31,23 @@ public abstract class BaseController<D extends BaseDTO, S extends IBaseService<D
         return ResponseEntity.ok(service.getByIds(ids));
     }
 
+    @PostMapping("/search")
+    public ResponseEntity<List<D>> search(@RequestBody SearchDTO<D> searchDTO){
+        return ResponseEntity.ok(service.search(searchDTO));
+    }
+
+    @PostMapping("/sort")
+    public ResponseEntity<List<D>> sort(@RequestBody SortDTO sortDTO){
+        return  ResponseEntity.ok(service.sort(sortDTO));
+    }
+
     @PostMapping("/save")
     public void save(@RequestBody D dto) {
         service.save(dto);
+    }
+
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable String id){
+        service.delete(id);
     }
 }
