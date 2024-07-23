@@ -1,8 +1,9 @@
-package fr.poseidonj.cinematec_back.service;
+package fr.poseidonj.cinematec_back.service.imp;
 
 import fr.poseidonj.cinematec_back.models.dtos.MovieDTO;
 import fr.poseidonj.cinematec_back.models.entities.Movie;
 import fr.poseidonj.cinematec_back.repositories.IMovieRepository;
+import fr.poseidonj.cinematec_back.service.IMovieService;
 import fr.poseidonj.cinematec_back.utilities.mapper.IMapper;
 import org.springframework.stereotype.Service;
 

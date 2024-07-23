@@ -1,10 +1,11 @@
-package fr.poseidonj.cinematec_back.service;
+package fr.poseidonj.cinematec_back.service.imp;
 
 import fr.poseidonj.cinematec_back.models.dtos.BaseDTO;
 import fr.poseidonj.cinematec_back.models.dtos.special.SearchDTO;
 import fr.poseidonj.cinematec_back.models.dtos.special.SortDTO;
 import fr.poseidonj.cinematec_back.models.entities.BaseEntity;
 import fr.poseidonj.cinematec_back.repositories.IBaseRepository;
+import fr.poseidonj.cinematec_back.service.IBaseService;
 import fr.poseidonj.cinematec_back.utilities.mapper.IMapper;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Sort;
