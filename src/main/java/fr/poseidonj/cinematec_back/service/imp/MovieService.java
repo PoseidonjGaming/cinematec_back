@@ -8,7 +8,7 @@ import fr.poseidonj.cinematec_back.utilities.mapper.IMapper;
 import org.springframework.stereotype.Service;
 
 @Service
-public class MovieService extends BaseService<Movie, MovieDTO> implements IMovieService {
+public class MovieService extends BaseService<Movie, MovieDTO, IMovieRepository> implements IMovieService {
 
     protected MovieService(IMovieRepository repository, IMapper mapper) {
         super(repository, Movie.class, MovieDTO.class, mapper);

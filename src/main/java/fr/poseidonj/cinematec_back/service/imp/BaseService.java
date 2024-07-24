@@ -15,13 +15,13 @@ import java.util.List;
 import static fr.poseidonj.cinematec_back.utilities.SearchUtility.filtering;
 import static fr.poseidonj.cinematec_back.utilities.SearchUtility.getMatcher;
 
-public abstract class BaseService<E extends BaseEntity, D extends BaseDTO> implements IBaseService<D> {
-    private final IBaseRepository<E> repository;
-    private final Class<E> entityClass;
-    private final Class<D> dtoClass;
-    private final IMapper mapper;
+public abstract class BaseService<E extends BaseEntity, D extends BaseDTO, R extends IBaseRepository<E>> implements IBaseService<D> {
+    protected final R repository;
+    protected final Class<E> entityClass;
+    protected final Class<D> dtoClass;
+    protected final IMapper mapper;
 
-    protected BaseService(IBaseRepository<E> repository, Class<E> entityClass, Class<D> dtoClass, IMapper mapper) {
+    protected BaseService(R repository, Class<E> entityClass, Class<D> dtoClass, IMapper mapper) {
         this.repository = repository;
         this.entityClass = entityClass;
         this.dtoClass = dtoClass;
