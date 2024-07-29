@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 public abstract class BaseController<D extends BaseDTO, S extends IBaseService<D>> {
     private final S service;
@@ -22,23 +23,23 @@ public abstract class BaseController<D extends BaseDTO, S extends IBaseService<D
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<D> getById(@PathVariable String id){
+    public ResponseEntity<D> getById(@PathVariable String id) {
         return ResponseEntity.ok(service.getById(id));
     }
 
     @PostMapping("/byIds")
-    public ResponseEntity<List<D>> getByIds(@RequestBody List<String> ids){
+    public ResponseEntity<List<D>> getByIds(@RequestBody List<String> ids) {
         return ResponseEntity.ok(service.getByIds(ids));
     }
 
     @PostMapping("/search")
-    public ResponseEntity<List<D>> search(@RequestBody SearchDTO<D> searchDTO){
+    public ResponseEntity<List<D>> search(@RequestBody SearchDTO<D> searchDTO) {
         return ResponseEntity.ok(service.search(searchDTO));
     }
 
     @PostMapping("/sort")
-    public ResponseEntity<List<D>> sort(@RequestBody SortDTO sortDTO){
-        return  ResponseEntity.ok(service.sort(sortDTO));
+    public ResponseEntity<List<D>> sort(@RequestBody SortDTO sortDTO) {
+        return ResponseEntity.ok(service.sort(sortDTO));
     }
 
     @PostMapping("/save")
@@ -47,7 +48,12 @@ public abstract class BaseController<D extends BaseDTO, S extends IBaseService<D
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable String id){
+    public void delete(@PathVariable String id) {
         service.delete(id);
+    }
+
+    @GetMapping("/structure")
+    public ResponseEntity<Map<String, String>> getStructure(){
+        return ResponseEntity.ok(service.getStructure());
     }
 }

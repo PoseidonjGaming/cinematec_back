@@ -15,7 +15,7 @@ import java.time.LocalTime;
 public class Movie extends BaseEntity {
     private String name;
     private String description;
-    private LocalTime duration;
+    private LocalTime runtime;
     private LocalDate releaseDate;
     private String poster;
 }

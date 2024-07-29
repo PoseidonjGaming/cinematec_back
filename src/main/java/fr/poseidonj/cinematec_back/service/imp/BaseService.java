@@ -6,14 +6,23 @@ import fr.poseidonj.cinematec_back.models.dtos.special.SortDTO;
 import fr.poseidonj.cinematec_back.models.entities.BaseEntity;
 import fr.poseidonj.cinematec_back.repositories.IBaseRepository;
 import fr.poseidonj.cinematec_back.service.IBaseService;
+import fr.poseidonj.cinematec_back.utilities.annotation.Json;
 import fr.poseidonj.cinematec_back.utilities.mapper.IMapper;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Sort;
 
+import java.lang.reflect.Field;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.function.BiConsumer;
 
 import static fr.poseidonj.cinematec_back.utilities.SearchUtility.filtering;
 import static fr.poseidonj.cinematec_back.utilities.SearchUtility.getMatcher;
+import static fr.poseidonj.cinematec_back.utilities.ServiceUtility.getMap;
 
 public abstract class BaseService<E extends BaseEntity, D extends BaseDTO, R extends IBaseRepository<E>> implements IBaseService<D> {
     protected final R repository;
@@ -26,6 +35,35 @@ public abstract class BaseService<E extends BaseEntity, D extends BaseDTO, R ext
         this.entityClass = entityClass;
         this.dtoClass = dtoClass;
         this.mapper = mapper;
+    }
+
+    @Override
+    public Map<String, String> getStructure() {
+        Map<String, String> structure = new LinkedHashMap<>();
+        Class<?> superClass = dtoClass.getSuperclass();
+
+        BiConsumer<Field, Map<String, String>> consumer = ((field, map) -> {
+            if (Objects.nonNull(field.getType().getSuperclass()) &&
+                    Number.class.isAssignableFrom(field.getType())) {
+                map.put(field.getName(), "number");
+            } else if (field.getType().equals(LocalTime.class)) {
+                map.put(field.getName(), "time");
+            } else if (field.getType().equals(LocalDate.class)) {
+                map.put(field.getName(), "date");
+            } else if (field.isAnnotationPresent(Json.class)) {
+                map.put(field.getName(), field.getAnnotation(Json.class).type());
+            } else {
+                map.put(field.getName(), field.getType().getSimpleName().toLowerCase());
+            }
+        });
+
+        while (!superClass.equals(Object.class)) {
+            structure.putAll(getMap(superClass, consumer));
+            superClass = superClass.getSuperclass();
+        }
+
+        structure.putAll(getMap(dtoClass, consumer));
+        return structure;
     }
 
     @Override
