@@ -1,14 +1,21 @@
 package fr.poseidonj.cinematec_back.utilities;
 
 import fr.poseidonj.cinematec_back.exception.GenericException;
+import fr.poseidonj.cinematec_back.models.dtos.BaseDTO;
+import fr.poseidonj.cinematec_back.models.dtos.special.PagedResponse;
+import fr.poseidonj.cinematec_back.models.dtos.special.SearchDTO;
+import fr.poseidonj.cinematec_back.models.entities.BaseEntity;
+import fr.poseidonj.cinematec_back.utilities.mapper.IMapper;
 import lombok.experimental.UtilityClass;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.lang.reflect.Field;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+
+import static fr.poseidonj.cinematec_back.utilities.SearchUtility.filtering;
 
 @UtilityClass
 public class ServiceUtility {
@@ -65,6 +72,19 @@ public class ServiceUtility {
         Map<String, T> map = new LinkedHashMap<>();
         browseField(clazz, field -> consumer.accept(field, map));
         return map;
+    }
+
+    public static Pageable getPageable(int size, int page) {
+        return Pageable.ofSize(size).withPage(page);
+    }
+
+    public  <D extends BaseDTO, E extends BaseEntity> PagedResponse<D> createPage(Page<E> pageRequest, SearchDTO<D> searchDTO, IMapper mapper, Class<D> dtoClass) {
+        List<D> list = mapper.convertList(pageRequest.getContent(), dtoClass);
+        if (Objects.nonNull(searchDTO)) {
+            list = list.stream().filter(d -> filtering(d, searchDTO)).toList();
+        }
+
+        return new PagedResponse<>(list, list.size(), pageRequest.getTotalElements());
     }
 
 }

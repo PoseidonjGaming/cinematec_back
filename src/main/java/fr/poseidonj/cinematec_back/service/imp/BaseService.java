@@ -1,6 +1,8 @@
 package fr.poseidonj.cinematec_back.service.imp;
 
+import fr.poseidonj.cinematec_back.exception.GenericException;
 import fr.poseidonj.cinematec_back.models.dtos.BaseDTO;
+import fr.poseidonj.cinematec_back.models.dtos.special.PagedResponse;
 import fr.poseidonj.cinematec_back.models.dtos.special.SearchDTO;
 import fr.poseidonj.cinematec_back.models.dtos.special.SortDTO;
 import fr.poseidonj.cinematec_back.models.entities.BaseEntity;
@@ -9,9 +11,11 @@ import fr.poseidonj.cinematec_back.service.IBaseService;
 import fr.poseidonj.cinematec_back.utilities.annotation.Json;
 import fr.poseidonj.cinematec_back.utilities.mapper.IMapper;
 import org.springframework.data.domain.Example;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.LinkedHashMap;
@@ -20,9 +24,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 
-import static fr.poseidonj.cinematec_back.utilities.SearchUtility.filtering;
-import static fr.poseidonj.cinematec_back.utilities.SearchUtility.getMatcher;
-import static fr.poseidonj.cinematec_back.utilities.ServiceUtility.getMap;
+import static fr.poseidonj.cinematec_back.utilities.SearchUtility.*;
+import static fr.poseidonj.cinematec_back.utilities.ServiceUtility.*;
 
 public abstract class BaseService<E extends BaseEntity, D extends BaseDTO, R extends IBaseRepository<E>> implements IBaseService<D> {
     protected final R repository;
@@ -72,6 +75,11 @@ public abstract class BaseService<E extends BaseEntity, D extends BaseDTO, R ext
     }
 
     @Override
+    public PagedResponse<D> getAll(int page, int size) {
+        return createPage(repository.findAll(getPageable(size, page)), null, mapper, dtoClass);
+    }
+
+    @Override
     public List<D> getByIds(List<String> ids) {
         return mapper.convertList(repository.findByIdIn(ids), dtoClass);
     }
@@ -85,10 +93,33 @@ public abstract class BaseService<E extends BaseEntity, D extends BaseDTO, R ext
     }
 
     @Override
+    public PagedResponse<D> search(SearchDTO<D> searchDTO, int page, int size) {
+        return createPage(
+                repository.findAll(
+                        Example.of(
+                                mapper.convert(searchDTO.getDto(), entityClass),
+                                getMatcher(searchDTO, entityClass)
+                        ), getPageable(size, page)
+                ), searchDTO, mapper, dtoClass);
+    }
+
+    @Override
     public List<D> sort(SortDTO sortDTO) {
         return mapper.convertList(repository.findAll(
                 Sort.by(sortDTO.getDirection(), sortDTO.getField())
         ), dtoClass);
+    }
+
+    @Override
+    public PagedResponse<D> sort(SortDTO sortDTO, int page, int size) {
+        E entity;
+        try {
+            entity = entityClass.getConstructor().newInstance();
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            throw new GenericException(e);
+        }
+        return  createPage(repository.findAll(Example.of(entity), PageRequest.of(page, size, sortDTO.getDirection(),
+                getPath(findField(entityClass, sortDTO.getField()).toArray(new String[]{})))), null, mapper, dtoClass);
     }
 
     @Override

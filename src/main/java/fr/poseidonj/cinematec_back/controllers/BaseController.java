@@ -1,6 +1,7 @@
 package fr.poseidonj.cinematec_back.controllers;
 
 import fr.poseidonj.cinematec_back.models.dtos.BaseDTO;
+import fr.poseidonj.cinematec_back.models.dtos.special.PagedResponse;
 import fr.poseidonj.cinematec_back.models.dtos.special.SearchDTO;
 import fr.poseidonj.cinematec_back.models.dtos.special.SortDTO;
 import fr.poseidonj.cinematec_back.service.IBaseService;
@@ -20,6 +21,11 @@ public abstract class BaseController<D extends BaseDTO, S extends IBaseService<D
     @GetMapping("/all")
     public ResponseEntity<List<D>> getAll() {
         return ResponseEntity.ok(service.getAll());
+    }
+
+    @GetMapping("/paged/all")
+    public ResponseEntity<PagedResponse<D>> getAll(int page, int size){
+        return  ResponseEntity.ok(service.getAll(page, size));
     }
 
     @GetMapping("/{id}")

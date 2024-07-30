@@ -6,7 +6,7 @@ import fr.poseidonj.cinematec_back.models.dtos.special.SortDTO;
 
 import java.util.List;
 
-public interface IBaseService<D extends BaseDTO> extends IAdminService{
+public interface IBaseService<D extends BaseDTO> extends IAdminService, IPageService<D>{
     List<D> getAll();
     List<D> getByIds(List<String> ids);
     List<D> search(SearchDTO<D> searchDTO);
