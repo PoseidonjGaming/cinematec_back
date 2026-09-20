@@ -13,7 +13,6 @@ import java.time.LocalTime;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Json(display = {"name"})
 public class MovieDTO extends BaseDTO {
     private String name;
     @Json(type = "text")

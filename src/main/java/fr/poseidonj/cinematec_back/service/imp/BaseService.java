@@ -70,6 +70,37 @@ public abstract class BaseService<E extends BaseEntity, D extends BaseDTO, R ext
     }
 
     @Override
+    public Map<String, String[]> getDisplay() {
+        Map<String, String[]> display = getMap(dtoClass, (field, map) -> {
+            if (!map.containsKey(field.getType().getSimpleName()) && field.isAnnotationPresent(Json.class)) {
+                map.put(field.getName(), field.getAnnotation(Json.class).display());
+            }
+        });
+        display.put("current", entityClass.getAnnotation(Json.class).display());
+        return display;
+    }
+
+    @Override
+    public Map<String, String> getType() {
+        Map<String, String> types = new LinkedHashMap<>();
+        Class<?> superClass = entityClass.getSuperclass();
+
+        BiConsumer<Field, Map<String, String>> biConsumer = (field, map) -> {
+            if (field.isAnnotationPresent(Json.class)) {
+                map.put(field.getName(), field.getAnnotation(Json.class).type());
+            }
+        };
+
+        while (!superClass.equals(Object.class)) {
+            types.putAll(getMap(superClass, biConsumer));
+            superClass = superClass.getSuperclass();
+        }
+
+        types.putAll(getMap(dtoClass, biConsumer));
+        return types;
+    }
+
+    @Override
     public List<D> getAll() {
         return mapper.convertList(repository.findAll(), dtoClass);
     }

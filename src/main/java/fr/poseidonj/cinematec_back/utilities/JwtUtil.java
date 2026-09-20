@@ -1,18 +1,21 @@
 package fr.poseidonj.cinematec_back.utilities;
 
 
-import fr.poseidonj.cinematec_back.models.dtos.UserDTO;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+import org.springframework.web.util.WebUtils;
 
 import javax.crypto.spec.SecretKeySpec;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 
 @Component
@@ -45,10 +48,10 @@ public class JwtUtil implements Serializable {
         return expiration.before(new Date());
     }
 
-    public String generateToken(UserDTO user) {
+    public String generateToken(String username, String role) {
         Map<String, Object> claims = new HashMap<>();
-        addClaim("Role", user.getRole(), claims);
-        return doGenerateToken(claims, user.getUsername());
+        addClaim("role", role, claims);
+        return doGenerateToken(claims, username);
     }
 
     public void addClaim(String key, Object value, Map<String, Object> claims) {
@@ -69,5 +72,10 @@ public class JwtUtil implements Serializable {
     public boolean validateToken(String token, UserDetails userDetails) {
         final String username = getUsernameFromToken(token);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+    }
+
+    public String getJwtFromCookie(HttpServletRequest request) {
+        Cookie cookie = WebUtils.getCookie(request, "jwt_cookie");
+        return (Objects.nonNull(cookie)) ? cookie.getValue() : null;
     }
 }

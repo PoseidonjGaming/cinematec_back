@@ -1,6 +1,5 @@
 package fr.poseidonj.cinematec_back.security;
 
-import fr.poseidonj.cinematec_back.exception.ExpiredTokenException;
 import fr.poseidonj.cinematec_back.exception.IllegalTokenException;
 import fr.poseidonj.cinematec_back.utilities.JwtUtil;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -35,35 +34,36 @@ public class JwtFilter extends OncePerRequestFilter {
 
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull FilterChain filterChain)
+    protected void doFilterInternal(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull FilterChain filterChain)
             throws IllegalTokenException, ServletException, IOException {
-        String authorizationHeader = request.getHeader("Authorization");
-        String username = null;
-        String token = null;
 
-        if (Objects.nonNull(authorizationHeader) && authorizationHeader.startsWith("Bearer")) {
-            token = authorizationHeader.substring(7);
+        final String requestTokenHeader = request.getHeader("Authorization");
+        String username = null;
+        String jwtToken = null;
+
+        if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")) {
+            jwtToken = requestTokenHeader.substring(7);
             try {
-                username = jwtUtil.getUsernameFromToken(token);
+                username = jwtUtil.getUsernameFromToken(jwtToken);
             } catch (IllegalArgumentException e) {
-                throw new IllegalTokenException();
+                System.out.println("Unable to get JWT Token");
             } catch (ExpiredJwtException e) {
-                throw new ExpiredTokenException();
+                System.out.println("JWT Token has expired");
             }
-        } else if (authorizationHeader != null) {
-            throw new IllegalTokenException();
+        } else if (requestTokenHeader != null) {
+            logger.warn("JWT Token does not begin with Bearer String");
         }
 
-        if (Objects.nonNull(username) && Objects.isNull(SecurityContextHolder.getContext())) {
+        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = service.loadUserByUsername(username);
 
-            if (Objects.nonNull(userDetails) && Boolean.TRUE.equals(jwtUtil.validateToken(token, userDetails))) {
-                UsernamePasswordAuthenticationToken userToken =
+            if (userDetails != null && jwtUtil.validateToken(jwtToken, userDetails)) {
+                UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
                         new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
 
-                userToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-                SecurityContextHolder.getContext().setAuthentication(userToken);
+                SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
             }
         }
         filterChain.doFilter(request, response);

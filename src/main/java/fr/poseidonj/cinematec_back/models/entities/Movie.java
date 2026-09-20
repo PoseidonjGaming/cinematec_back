@@ -1,5 +1,6 @@
 package fr.poseidonj.cinematec_back.models.entities;
 
+import fr.poseidonj.cinematec_back.utilities.annotation.Json;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,6 +13,7 @@ import java.time.LocalTime;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Json(display = {"name"})
 public class Movie extends BaseEntity {
     private String name;
     private String description;

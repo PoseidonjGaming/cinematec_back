@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 public abstract class BaseController<D extends BaseDTO, S extends IBaseService<D>> {
-    private final S service;
+    protected final S service;
 
     protected BaseController(S service) {
         this.service = service;
@@ -24,8 +24,8 @@ public abstract class BaseController<D extends BaseDTO, S extends IBaseService<D
     }
 
     @GetMapping("/paged/all")
-    public ResponseEntity<PagedResponse<D>> getAll(int page, int size){
-        return  ResponseEntity.ok(service.getAll(page, size));
+    public ResponseEntity<PagedResponse<D>> getAll(int page, int size) {
+        return ResponseEntity.ok(service.getAll(page, size));
     }
 
     @GetMapping("/{id}")
@@ -59,7 +59,17 @@ public abstract class BaseController<D extends BaseDTO, S extends IBaseService<D
     }
 
     @GetMapping("/structure")
-    public ResponseEntity<Map<String, String>> getStructure(){
+    public ResponseEntity<Map<String, String>> getStructure() {
         return ResponseEntity.ok(service.getStructure());
+    }
+
+    @GetMapping("/display")
+    public ResponseEntity<Map<String, String[]>> getDisplay() {
+        return ResponseEntity.ok(service.getDisplay());
+    }
+
+    @GetMapping("/type")
+    public ResponseEntity<Map<String, String>> getType(){
+        return ResponseEntity.ok(service.getType());
     }
 }
