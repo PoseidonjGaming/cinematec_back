@@ -4,14 +4,11 @@ import fr.poseidonj.cinematec_back.models.dtos.UserDTO;
 import fr.poseidonj.cinematec_back.security.CredentialDTO;
 import fr.poseidonj.cinematec_back.security.JwtResponse;
 import fr.poseidonj.cinematec_back.service.IUserService;
-import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.time.Duration;
 
 @RestController
 @RequestMapping("/user")

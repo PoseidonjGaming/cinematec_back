@@ -65,7 +65,9 @@ public class WebConfig {
                 .authorizeHttpRequests(auth -> {
                     try {
                         auth.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                                .anyRequest().permitAll();
+                                .requestMatchers("/user/authenticate", "/user/registration").permitAll()
+                                .anyRequest().authenticated();
+
                     } catch (Exception e) {
                         throw new SecurityException(e);
                     }
