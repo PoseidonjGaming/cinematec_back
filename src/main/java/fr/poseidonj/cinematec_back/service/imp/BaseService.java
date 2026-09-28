@@ -10,13 +10,16 @@ import fr.poseidonj.cinematec_back.repositories.IBaseRepository;
 import fr.poseidonj.cinematec_back.service.IBaseService;
 import fr.poseidonj.cinematec_back.utilities.annotation.Json;
 import fr.poseidonj.cinematec_back.utilities.mapper.IMapper;
+import fr.poseidonj.cinematec_back.utilities.mapper.Mapper;
 import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -160,11 +163,17 @@ public abstract class BaseService<E extends BaseEntity, D extends BaseDTO, R ext
 
     @Override
     public void save(D dto) {
+        dto.setCreatedAt(LocalDateTime.now());
         repository.save(mapper.convert(dto, entityClass));
     }
 
     @Override
     public void delete(String id) {
         repository.deleteById(id);
+    }
+
+    @Override
+    public List<D> getLastAdded() {
+        return sort(new SortDTO("createdAt", Sort.Direction.DESC), 0, 5).getContent();
     }
 }

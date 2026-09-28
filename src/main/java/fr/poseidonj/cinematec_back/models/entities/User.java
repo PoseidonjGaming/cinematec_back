@@ -21,4 +21,5 @@ public class User extends BaseEntity {
     private String lastname;
     private String email;
     private String phoneNumber;
+    private boolean mustChangePassword;
 }

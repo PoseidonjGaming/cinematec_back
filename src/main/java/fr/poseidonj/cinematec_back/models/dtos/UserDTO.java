@@ -20,4 +20,5 @@ public class UserDTO extends BaseDTO {
     private String email;
     @Json(type = "phone")
     private String phoneNumber;
+    private boolean mustChangePassword;
 }

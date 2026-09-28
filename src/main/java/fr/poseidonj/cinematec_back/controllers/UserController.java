@@ -1,5 +1,6 @@
 package fr.poseidonj.cinematec_back.controllers;
 
+import fr.poseidonj.cinematec_back.models.dtos.RegistrationDTO;
 import fr.poseidonj.cinematec_back.models.dtos.UserDTO;
 import fr.poseidonj.cinematec_back.security.CredentialDTO;
 import fr.poseidonj.cinematec_back.security.JwtResponse;
@@ -23,8 +24,8 @@ public class UserController extends BaseController<UserDTO, IUserService> {
     }
 
     @PostMapping("/registration")
-    public void registration(@RequestBody CredentialDTO dto) {
-        service.registration(dto);
+    public ResponseEntity<String> registration(@RequestBody RegistrationDTO dto) {
+        return ResponseEntity.ok(service.registration(dto));
     }
 
     @PostMapping("/update/password")

@@ -5,13 +5,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
-
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public abstract class BaseDTO {
-    private String id;
-    private LocalDateTime createdAt;
+public class RegistrationDTO {
+    public String username;
 }

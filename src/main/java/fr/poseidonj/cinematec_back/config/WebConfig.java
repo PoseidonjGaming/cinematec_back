@@ -65,7 +65,9 @@ public class WebConfig {
                 .authorizeHttpRequests(auth -> {
                     try {
                         auth.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                                .requestMatchers("/user/authenticate", "/user/registration").permitAll()
+                                .requestMatchers("/user/authenticate", "/user/registration",
+                                        "/movie/last-added").permitAll()
+                                .requestMatchers("/*/all").hasAuthority("ROLE_ADMIN")
                                 .anyRequest().authenticated();
 
                     } catch (Exception e) {

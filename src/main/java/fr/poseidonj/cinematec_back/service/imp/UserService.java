@@ -1,5 +1,7 @@
 package fr.poseidonj.cinematec_back.service.imp;
 
+import fr.poseidonj.cinematec_back.models.CharacterDatas;
+import fr.poseidonj.cinematec_back.models.dtos.RegistrationDTO;
 import fr.poseidonj.cinematec_back.models.dtos.UserDTO;
 import fr.poseidonj.cinematec_back.models.dtos.special.SearchDTO;
 import fr.poseidonj.cinematec_back.models.entities.Role;
@@ -12,7 +14,9 @@ import fr.poseidonj.cinematec_back.service.IUserService;
 import fr.poseidonj.cinematec_back.utilities.JwtUtil;
 import fr.poseidonj.cinematec_back.utilities.mapper.IMapper;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.factory.annotation.Value;
+import org.passay.data.EnglishCharacterData;
+import org.passay.generate.PasswordGenerator;
+import org.passay.rule.CharacterRule;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
@@ -33,8 +37,6 @@ public class UserService extends BaseService<User, UserDTO, IUserRepository> imp
     protected final AuthenticationManager authenticationManager;
     private final PasswordEncoder encoder;
     private final IRoleRepository roleRepository;
-    @Value("${user.default}")
-    private String defaultPassword;
 
     @Lazy
     protected UserService(IUserRepository repository, IMapper mapper, JwtUtil jwtTokenUtil, AuthenticationManager authenticationManager, PasswordEncoder encoder, IRoleRepository roleRepository) {
@@ -48,7 +50,7 @@ public class UserService extends BaseService<User, UserDTO, IUserRepository> imp
     @Override
     public void save(UserDTO dto) {
         User user = mapper.convert(dto, entityClass);
-        user.setPassword(encoder.encode(defaultPassword));
+        user.setPassword(encoder.encode(generatePassword()));
 
         repository.save(user);
     }
@@ -59,7 +61,8 @@ public class UserService extends BaseService<User, UserDTO, IUserRepository> imp
             User user = repository.findByUsername(username);
             Role role = roleRepository.findById(user.getRoleId()).orElse(new Role());
             return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(),
-                    List.of(new SimpleGrantedAuthority(role.getId())));
+                    List.of(new SimpleGrantedAuthority(String.join("_",
+                            "ROLE", role.getName().toUpperCase()))));
         } catch (Exception e) {
             throw new UsernameNotFoundException("User not found");
         }
@@ -87,11 +90,25 @@ public class UserService extends BaseService<User, UserDTO, IUserRepository> imp
     }
 
     @Override
-    public void registration(CredentialDTO userDTO) {
+    public String registration(RegistrationDTO userDTO) {
+        String password = generatePassword();
         User user = mapper.convert(userDTO, entityClass);
-        user.setPassword(encoder.encode(userDTO.getPassword()));
+        user.setPassword(encoder.encode(password));
+        user.setRoleId(roleRepository.findByName("USER")
+                .orElseThrow(() -> new RuntimeException("Role USER not found")).getId());
 
         repository.save(user);
+        return password;
+    }
+
+    private String generatePassword() {
+        CharacterRule upCharRule = new CharacterRule(EnglishCharacterData.UpperCase, 1);
+        CharacterRule lowerCharRule = new CharacterRule(EnglishCharacterData.LowerCase, 1);
+        CharacterRule digitCharRule = new CharacterRule(EnglishCharacterData.Digit, 1);
+        CharacterRule specialCharRule = new CharacterRule(CharacterDatas.Non_Alphanumeric, 1);
+        PasswordGenerator gen = new PasswordGenerator(12,
+                upCharRule, lowerCharRule, digitCharRule, specialCharRule);
+        return gen.generate().toString();
     }
 
     private void authenticateManager(@NotNull String username, @NotNull String password) throws AuthenticationCredentialsNotFoundException {
