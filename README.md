@@ -12,8 +12,8 @@ API backend pour l’application **Cinematec**, destinée à la gestion de **fil
 - [Technologies utilisées](#technologies-utilisées)
 - [Prérequis](#prérequis)
 - [Configuration](#configuration)
-- [Lancement](#lancement)
 - [Structure du projet](#structure-du-projet)
+- [Lancement](#lancement)
 
 ## Résumé du projet
 
