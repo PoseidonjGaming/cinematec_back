@@ -137,3 +137,17 @@ cinematec_back/
 ├── mvnw.cmd
 └── .gitignore
 ```
+
+## Lancement
+
+```bash
+# Cloner le projet
+git clone https://github.com/PoseidonjGaming/cinematec_back.git
+cd cinematec_back
+
+# Définir la clé JWT (exemple)
+export JWT_SECRET=votre_cle_secrete_tres_longue_et_securisee
+
+# Lancer l’application
+./mvnw spring-boot:run
+```
